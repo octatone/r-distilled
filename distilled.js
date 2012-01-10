@@ -40,7 +40,7 @@ function loadPosts(option) {
                 });
         });
 
-    if (option == 'all') {
+    if (option === 'all') {
         sub = 'r/all/';
     }
 
