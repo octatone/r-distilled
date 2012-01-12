@@ -16,7 +16,26 @@ function filterDupes(arr) {
         obj = {},
         original_length = arr.length;
 
-        //remove dupes
+        //revmove dupe urls
+        for (i = arr.length - 1; i >= 0; i--) {
+            if (typeof obj[arr[i].data.url] != 'undefined') {
+                delete obj[arr[i].data.url];
+            }
+            obj[arr[i].data.url] = arr[i];
+        }
+        for (i in obj) {
+            out.push(obj[i]);
+        }
+
+        var urls_removed = original_length - out.length;
+        consoleLog('Removed urls: ' + urls_removed);
+
+        //reset
+        arr = out.reverse();
+        out = [];
+        obj = {};
+
+        //remove dupe subreddits
         for (i = arr.length - 1; i >= 0; i--) {
             if (typeof obj[arr[i].data.subreddit] != 'undefined') {
                 delete obj[arr[i].data.subreddit];
@@ -26,6 +45,9 @@ function filterDupes(arr) {
         for (i in obj) {
             out.push(obj[i]);
         }
+
+        consoleLog('Removed subreddit posts: ' + (original_length - out.length - urls_removed));
+        consoleLog('Total posts: ' + out.length);
 
         return out.reverse();
 }
@@ -80,6 +102,15 @@ function loadAll() {
     loadPosts('all');
 }
 
+/* Utility Functions */
+//safe console log
+function consoleLog(string){
+    if(window.console) {
+        console.log(string);
+    }
+}
+
+//start
 $(function() {
         loadFront();
 });
