@@ -2,14 +2,14 @@ function display(data) {
     var content, button, $listing = $('#listing');
 
     $listing.empty().hide();
-
+    /* yes the following is ugly, but fuck you */
     for (x in data) {
 	button = redditButton('t3_' + data[x].data.id);
         content = '<div class="thing"><div class="vote-button">' + button +'</div><a href="' + data[x].data.url + '" class="thumbnail" target="_blank"><img src="' + data[x].data.thumbnail + '" width="70"/></a><div class="entry">' + '<p class="title">' + '<a href="' + data[x].data.url + '" class="title" target="_blank">' + data[x].data.title + '</a>' + ' <span class="domain">(' + data[x].data.domain + ')</span>' + '</p>' + '<p class="tagline">' + '<span class="score">' + data[x].data.score + '</span> (<span class="ups">' + data[x].data.ups + '</span>|<span class="downs">' + data[x].data.downs + '</span>) ' + 'submitted ' + longAgo(data[x].data.created_utc) + ' hours ago by ' + '<a href="http://reddit.com/user/' + data[x].data.author + '" class="author" target="_blank">' + data[x].data.author + '</a> to ' + '<a href="http://reddit.com/r/' + data[x].data.subreddit + '" class="subreddit" target="_blank">' + data[x].data.subreddit + '</a>' + '</p>' + '<ul class="flat-list">' + '<li><a href="http://reddit.com' + data[x].data.permalink + '" class="comments" target="_blank">' + data[x].data.num_comments + ' comments</a></li>' + '</ul>' + '</div></div>' + '<div class="clearleft"></div>';
 
         $listing.append(content);
     }
-    $listing.hide().fadeIn('slow');
+    $listing.fadeIn('slow');
 }
 
 function filterDupes(arr) {
@@ -28,8 +28,8 @@ function filterDupes(arr) {
             out.push(obj[i]);
         }
 
-        var urls_removed = original_length - out.length;
-        consoleLog('Removed urls: ' + urls_removed);
+        var dupe_urls = original_length - out.length;
+        consoleLog('Removed urls: ' + dupe_urls);
 
         //reset
         arr = out.reverse();
@@ -47,7 +47,9 @@ function filterDupes(arr) {
             out.push(obj[i]);
         }
 
-        consoleLog('Removed subreddit posts: ' + (original_length - out.length - urls_removed));
+	var dupe_subs = original_length - out.length
+
+        consoleLog('Removed subreddit posts: ' + (dupe_subs - dupe_urls));
         consoleLog('Total posts: ' + out.length);
 
         return out.reverse();
