@@ -27,6 +27,11 @@ h2 {
     margin-bottom: 30px;
 }
 
+.vote-button {
+    float: left;
+    margin-left: 5px;
+}
+
 .entry {
     overflow: hidden;
     margin-left: 3px;
