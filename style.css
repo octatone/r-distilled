@@ -134,3 +134,7 @@ a {
     text-align: center;
     font-weight: bold;
 }
+
+.hidden {
+    display: none;
+}

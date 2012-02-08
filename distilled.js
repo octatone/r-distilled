@@ -1,34 +1,65 @@
-function display(data) {
-    var content, button, $listing = $('#listing');
+/* global namespace */
+var globals = {'percent': 65}
 
-    $listing.empty().hide();
-    /* yes the following is ugly, but fuck you */
-    for (x in data) {
-	button = redditButton('t3_' + data[x].data.id);
-        content = '<div class="thing"><div class="vote-button">' + button +'</div><a href="' + data[x].data.url + '" class="thumbnail" target="_blank"><img src="' + data[x].data.thumbnail + '" width="70"/></a><div class="entry">' + '<p class="title">' + '<a href="' + data[x].data.url + '" class="title" target="_blank">' + data[x].data.title + '</a>' + ' <span class="domain">(' + data[x].data.domain + ')</span>' + '</p>' + '<p class="tagline">' + '<span class="score">' + data[x].data.score + '</span> (<span class="ups">' + data[x].data.ups + '</span>|<span class="downs">' + data[x].data.downs + '</span>) ' + 'submitted ' + longAgo(data[x].data.created_utc) + ' hours ago by ' + '<a href="http://reddit.com/user/' + data[x].data.author + '" class="author" target="_blank">' + data[x].data.author + '</a> to ' + '<a href="http://reddit.com/r/' + data[x].data.subreddit + '" class="subreddit" target="_blank">' + data[x].data.subreddit + '</a>' + '</p>' + '<ul class="flat-list">' + '<li><a href="http://reddit.com' + data[x].data.permalink + '" class="comments" target="_blank">' + data[x].data.num_comments + ' comments</a></li>' + '</ul>' + '</div></div>' + '<div class="clearleft"></div>';
+/* this function is recursive for sequential item displaying */
+function display(data, item) {
+    var content, button, centage, $listing = $('#listing');
+    var x = typeof(item) != 'undefined' ? item : 0;
 
-        $listing.append(content);
+    if(x == 0){
+	$listing.empty();
     }
-    $listing.fadeIn('slow');
+
+    /* gather html */
+    button = redditButton('t3_' + data[x].data.id);
+    centage = Math.round(data[x].data.ups / (data[x].data.ups + data[x].data.downs) * 100);
+    content = '<div id="' + data[x].data.id + '" class="thing hidden"><div class="vote-button">' + button +'</div><a href="' + data[x].data.url + '" class="thumbnail" target="_blank"><img src="' + data[x].data.thumbnail + '" width="70"/></a><div class="entry">' + '<p class="title">' + '<a href="' + data[x].data.url + '" class="title" target="_blank">' + data[x].data.title + '</a>' + ' <span class="domain">(' + data[x].data.domain + ')</span>' + '</p>' + '<p class="tagline">' + '<span class="score">' + data[x].data.score + '</span> (<span class="ups">' + data[x].data.ups + '</span>|<span class="downs">' + data[x].data.downs + '</span>) ' + centage +'% submitted ' + longAgo(data[x].data.created_utc) + ' hours ago by ' + '<a href="http://reddit.com/user/' + data[x].data.author + '" class="author" target="_blank">' + data[x].data.author + '</a> to ' + '<a href="http://reddit.com/r/' + data[x].data.subreddit + '" class="subreddit" target="_blank">' + data[x].data.subreddit + '</a>' + '</p>' + '<ul class="flat-list">' + '<li><a href="http://reddit.com' + data[x].data.permalink + '" class="comments" target="_blank">' + data[x].data.num_comments + ' comments</a></li>' + '</ul>' + '</div></div>' + '<div class="clearleft"></div>';
+
+    /* display html */
+    $listing.append(content);
+    $('#'+data[x].data.id).fadeIn(function(){
+	    if(x < data.length - 1){
+		/* recurse */
+		display(data, x+1);
+	    }
+	});
 }
 
 function filterDupes(arr) {
-    var i, out = [],
+    var i, centage, 
+	out = [],
         obj = {},
         original_length = arr.length;
 
+	//remove below percentagt
+        for (i = arr.length - 1; i >= 0; i--) {
+	    centage = Math.round(arr[i].data.ups / (arr[i].data.ups + arr[i].data.downs) * 100);
+	    if(centage > globals.percent){
+		out.push(arr[i]);
+	    }
+        }
+
+        var thresh_urls = original_length - out.length;
+        consoleLog('Removed by percentage: ' + thresh_urls);
+
+        //reset
+        arr = out.reverse();
+        out = [];
+
         //revmove dupe urls
         for (i = arr.length - 1; i >= 0; i--) {
+	    /* if the url is previously stored, delete it */ 
             if (typeof obj[arr[i].data.url] != 'undefined') {
                 delete obj[arr[i].data.url];
             }
+	    /* store current url */
             obj[arr[i].data.url] = arr[i];
         }
         for (i in obj) {
             out.push(obj[i]);
         }
 
-        var dupe_urls = original_length - out.length;
+        var dupe_urls = original_length - thresh_urls - out.length;
         consoleLog('Removed urls: ' + dupe_urls);
 
         //reset
@@ -47,9 +78,9 @@ function filterDupes(arr) {
             out.push(obj[i]);
         }
 
-	var dupe_subs = original_length - out.length
+	var dupe_subs = original_length - dupe_urls - thresh_urls - out.length
 
-        consoleLog('Removed subreddit posts: ' + (dupe_subs - dupe_urls));
+        consoleLog('Removed subreddit posts: ' + dupe_subs);
         consoleLog('Total posts: ' + out.length);
 
         return out.reverse();
