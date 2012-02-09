@@ -1,9 +1,18 @@
 /* global namespace */
 var globals = {'view': null,
-	       'percent': 55,
+
+	       /* filter defauls */
 	       'imgur': true,
 	       'quickmeme': true,
-	       'cur_request': null
+	       'images': false,
+	       'percent': 55, /* posts with a total up percentage below are filtered out */
+
+	       'cur_request': null,
+
+	       'optional_filters': {'imgur':{'type': 'domain', 'needles': ['imgur.com','i.imgur.com']},
+				    'quickmeme':{'type': 'domain', 'needles': ['quickmeme.com','qkme.me']},
+				    'images':{'type': 'url', 'needles': ['jpg','png','gif']}
+                                   }
 }
 
 /* this function is recursive for sequential item displaying */
@@ -31,96 +40,77 @@ function display(data, item) {
 }
 
 function filterDupes(arr) {
-    var i, centage, 
+    var i, centage, found, removed,
 	out = [],
         obj = {},
         original_length = arr.length;
 
-	//remove below percentage
-        for (i = arr.length - 1; i >= 0; i--) {
-	    centage = Math.round(arr[i].data.ups / (arr[i].data.ups + arr[i].data.downs) * 100);
-	    if(centage > globals.percent){
-		out.push(arr[i]);
-	    }
-        }
-
-        var thresh_urls = original_length - out.length;
-        consoleLog('Removed by percentage: ' + thresh_urls);
-
-        //reset
-        arr = out.reverse();
-        out = [];
-
-	//remove imgur
-	if(globals.imgur){
+    // run optional filters first
+    // consult globals namespace
+    for(var opt in globals.optional_filters){
+	if(globals[opt]){
+	    removed = 0;
 	    for (i = arr.length - 1; i >= 0; i--) {
-		if(arr[i].data.domain !== 'imgur.com' && arr[i].data.domain !== 'i.imgur.com'){
+		found = false;
+		for(needle in globals.optional_filters[opt].needles){
+		    needle = globals.optional_filters[opt].needles[needle];
+		    found = arr[i].data[globals.optional_filters[opt].type].indexOf(needle) == -1 ? found : true;
+		}			
+		if(!found){
 		    out.push(arr[i]);
+		}else{
+		    removed += 1;
 		}
 	    }
-	    
-	    var imgur_urls = original_length - thresh_urls - out.length;
-	    consoleLog('Removed imgur: ' + imgur_urls);
-	    
+	    consoleLog('Removed ' + opt + ' (' + globals.optional_filters[opt].type + '): ' + removed);
+
 	    //reset
 	    arr = out.reverse();
 	    out = [];
 	}
+    } 
 
-	//remove quickmeme
-	if(globals.quickmeme){
-	    for (i = arr.length - 1; i >= 0; i--) {
-		if(arr[i].data.domain !== 'quickmeme.com' && arr[i].data.domain !== 'qkme.me'){
-		    out.push(arr[i]);
-		}
-	    }
-	    
-	    var quick_urls = original_length - imgur_urls - thresh_urls - out.length;
-	    consoleLog('Removed quickmeme: ' + quick_urls);
-	    
-	    //reset
-	    arr = out.reverse();
-	    out = [];
+    //remove below percentage
+    removed = 0;
+    for (i = arr.length - 1; i >= 0; i--) {
+	centage = Math.round(arr[i].data.ups / (arr[i].data.ups + arr[i].data.downs) * 100);
+	if(centage > globals.percent){
+	    out.push(arr[i]);
+	}else{
+	    removed += 1;
 	}
+    }    
+    consoleLog('Removed by percentage: ' + removed);
+    
+    //reset
+    arr = out.reverse();
+    out = [];
 
-        //revmove dupe urls
-        for (i = arr.length - 1; i >= 0; i--) {
+    //revmove dupes urls, subreddits
+    var dupes = ['url','subreddit'];
+    for (dupe in dupes){
+	dupe = dupes[dupe];
+	for (i = arr.length - 1; i >= 0; i--) {
 	    /* if the url is previously stored, delete it */ 
-            if (typeof obj[arr[i].data.url] != 'undefined') {
-                delete obj[arr[i].data.url];
-            }
+	    if (typeof obj[arr[i].data[dupe]] != 'undefined') {
+		delete obj[arr[i].data[dupe]];
+	    }
 	    /* store current url */
-            obj[arr[i].data.url] = arr[i];
-        }
-        for (i in obj) {
-            out.push(obj[i]);
-        }
-
-        var dupe_urls = original_length - quick_urls - imgur_urls - thresh_urls - out.length;
-        consoleLog('Removed urls: ' + dupe_urls);
-
-        //reset
-        arr = out.reverse();
-        out = [];
-        obj = {};
-
-        //remove dupe subreddits
-        for (i = arr.length - 1; i >= 0; i--) {
-            if (typeof obj[arr[i].data.subreddit] != 'undefined') {
-                delete obj[arr[i].data.subreddit];
-            }
-            obj[arr[i].data.subreddit] = arr[i];
-        }
-        for (i in obj) {
-            out.push(obj[i]);
-        }
-
-	var dupe_subs = original_length - quick_urls - imgur_urls - dupe_urls - thresh_urls - out.length
-
-        consoleLog('Removed subreddit posts: ' + dupe_subs);
-        consoleLog('Total posts: ' + out.length);
-
-        return out.reverse();
+	    obj[arr[i].data[dupe]] = arr[i];
+	}
+	for (i in obj) {
+	    out.push(obj[i]);
+	}
+	
+	consoleLog('Removed ' + dupe + ': ' + (arr.length - out.length));
+	
+	//reset
+	arr = out.reverse();
+	out = [];
+	obj = {};
+    }
+    consoleLog('Posts distilled: ' + arr.length);
+    return arr;
 }
 
 function loadPosts(option) {
@@ -211,6 +201,10 @@ $(function() {
 	$('#quickmeme').click(function() {
                 globals.quickmeme = ($('#quickmeme').is(':checked')) ? true : false;
 		refresh();
+            });
+	$('#images').click(function() {
+                globals.images = ($('#images').is(':checked')) ? true : false;
+                refresh();
             });
 
         loadFront();
