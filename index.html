@@ -13,7 +13,17 @@
 <body>
   <h1>r/distilled</h1>
   <h2>cut through the crap!</h2>
-  <div id="options">[ <a href="#" id="front">front page</a> | <a href="#" id="all">/r/all</a> ]</div>
+  <div id="filters">
+    <form>
+        <input type="checkbox" id="imgur" checked/>
+	<label for="imgur">no imgur</label>
+        <input type="checkbox" id="quickmeme" checked/>
+        <label for="quickmeme">no quickmeme</label>
+    </form>
+  </div>
+  <div id="options">
+    [ <a href="#" id="front">front page</a> | <a href="#" id="all">/r/all</a> ]
+  </div>
   <div id="listing"></div>
   <div id="footer">
     <p>r/distilled filters the reddit front page and /r/all down to one post per subreddit preventing circlejerks and bandwagons from taking over your reddit experience</p>

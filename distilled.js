@@ -1,5 +1,10 @@
 /* global namespace */
-var globals = {'percent': 65}
+var globals = {'view': null,
+	       'percent': 55,
+	       'imgur': true,
+	       'quickmeme': true,
+	       'cur_request': null
+}
 
 /* this function is recursive for sequential item displaying */
 function display(data, item) {
@@ -31,7 +36,7 @@ function filterDupes(arr) {
         obj = {},
         original_length = arr.length;
 
-	//remove below percentagt
+	//remove below percentage
         for (i = arr.length - 1; i >= 0; i--) {
 	    centage = Math.round(arr[i].data.ups / (arr[i].data.ups + arr[i].data.downs) * 100);
 	    if(centage > globals.percent){
@@ -46,6 +51,38 @@ function filterDupes(arr) {
         arr = out.reverse();
         out = [];
 
+	//remove imgur
+	if(globals.imgur){
+	    for (i = arr.length - 1; i >= 0; i--) {
+		if(arr[i].data.domain !== 'imgur.com' && arr[i].data.domain !== 'i.imgur.com'){
+		    out.push(arr[i]);
+		}
+	    }
+	    
+	    var imgur_urls = original_length - thresh_urls - out.length;
+	    consoleLog('Removed imgur: ' + imgur_urls);
+	    
+	    //reset
+	    arr = out.reverse();
+	    out = [];
+	}
+
+	//remove quickmeme
+	if(globals.quickmeme){
+	    for (i = arr.length - 1; i >= 0; i--) {
+		if(arr[i].data.domain !== 'quickmeme.com' && arr[i].data.domain !== 'qkme.me'){
+		    out.push(arr[i]);
+		}
+	    }
+	    
+	    var quick_urls = original_length - imgur_urls - thresh_urls - out.length;
+	    consoleLog('Removed quickmeme: ' + quick_urls);
+	    
+	    //reset
+	    arr = out.reverse();
+	    out = [];
+	}
+
         //revmove dupe urls
         for (i = arr.length - 1; i >= 0; i--) {
 	    /* if the url is previously stored, delete it */ 
@@ -59,7 +96,7 @@ function filterDupes(arr) {
             out.push(obj[i]);
         }
 
-        var dupe_urls = original_length - thresh_urls - out.length;
+        var dupe_urls = original_length - quick_urls - imgur_urls - thresh_urls - out.length;
         consoleLog('Removed urls: ' + dupe_urls);
 
         //reset
@@ -78,7 +115,7 @@ function filterDupes(arr) {
             out.push(obj[i]);
         }
 
-	var dupe_subs = original_length - dupe_urls - thresh_urls - out.length
+	var dupe_subs = original_length - quick_urls - imgur_urls - dupe_urls - thresh_urls - out.length
 
         consoleLog('Removed subreddit posts: ' + dupe_subs);
         consoleLog('Total posts: ' + out.length);
@@ -100,7 +137,10 @@ function loadPosts(option) {
         sub = 'r/all/';
     }
 
-    var cur_chan_req = $.ajax({
+    if(globals.cur_request !== null){
+	globals.cur_request.abort();
+    }
+    globals.cur_request = $.ajax({
             url: "http://reddit.com/" + sub + ".json?limit=100",
             dataType: "jsonp",
             jsonp: "jsonp",
@@ -133,15 +173,25 @@ function longAgo(time) {
 }
 
 function loadFront() {
+    globals.view = 'front';
     $('#front').off();
     $('#all').off().on('click', loadAll);
     loadPosts();
 }
 
 function loadAll() {
+    globals.view = 'all';
     $('#all').off();
     $('#front').off().on('click', loadFront);
     loadPosts('all');
+}
+
+function refresh() {
+    if(globals.view = 'all'){
+	loadAll();
+    }else{
+	loadFront();
+    }
 }
 
 /* Utility Functions */
@@ -154,5 +204,14 @@ function consoleLog(string){
 
 //start
 $(function() {
+	$('#imgur').click(function() {
+		globals.imgur = ($('#imgur').is(':checked')) ? true : false;
+		refresh();
+	    });
+	$('#quickmeme').click(function() {
+                globals.quickmeme = ($('#quickmeme').is(':checked')) ? true : false;
+		refresh();
+            });
+
         loadFront();
 });

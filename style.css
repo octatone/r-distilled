@@ -14,7 +14,7 @@ h2 {
     font-size: small;
 }
 
-#options {
+#options, #filters {
     text-align: center;
 }
 
@@ -137,4 +137,8 @@ a {
 
 .hidden {
     display: none;
+}
+
+label {
+    vertical-align: top;
 }
