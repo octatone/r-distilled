@@ -1,5 +1,5 @@
 /* global namespace */
-var globals = {'view': 'front',
+var globals = {'view': 'all',
 
 	       /* filter defauls */
 	       'imgur': true,
@@ -147,8 +147,26 @@ function loadPosts(option) {
 		dataType: "jsonp",
 		jsonp: "jsonp",
 		success: function(data) {
+		    consoleLog('outer xhr');
 		    globals.posts = data.data.children;
-		    display(filterDupes(globals.posts));
+		    /* do it again!!! */
+		    setTimeout(function(){
+			    globals.cur_request = $.ajax({
+				    url: "http://reddit.com/" + sub + ".json?limit=100&after=" + globals.posts[globals.posts.length -1].data.name,
+				    dataType: "jsonp",
+				    jsonp: "jsonp",
+				    success: function(data) {
+					consoleLog('inner xhr')
+					globals.posts = globals.posts.concat(data.data.children);
+					display(filterDupes(globals.posts));
+				    },
+				    error: function(jXHR, textStatus, errorThrown) {
+					if (textStatus !== 'abort') {
+					    $listing.empty().append('<div id="error">Could not load feed. Is reddit down?</div>');
+					}
+				    }
+				});
+			}, 2000);
 		},
 		error: function(jXHR, textStatus, errorThrown) {
 		    if (textStatus !== 'abort') {
