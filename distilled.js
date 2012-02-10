@@ -37,7 +37,7 @@ function display(data, item) {
 
     /* display html */
     $listing.append(content);
-    $('#'+data[x].data.id).fadeIn(function(){
+    $('#'+data[x].data.id).fadeIn(200, function(){
 	    if(x < data.length - 1){
 		/* recurse */
 		display(data, x+1);
