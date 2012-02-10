@@ -194,18 +194,14 @@ function consoleLog(string){
 
 //start
 $(function() {
-	$('#imgur').click(function() {
-		globals.imgur = ($('#imgur').is(':checked')) ? true : false;
-		refresh();
-	    });
-	$('#quickmeme').click(function() {
-                globals.quickmeme = ($('#quickmeme').is(':checked')) ? true : false;
-		refresh();
-            });
-	$('#images').click(function() {
-                globals.images = ($('#images').is(':checked')) ? true : false;
-                refresh();
-            });
-
+	/* bind up check boxes */
+	var boxes = ['imgur','quickmeme','images'];
+	for(x in boxes){
+	    $('#'+boxes[x]).click(function() {
+		    globals[boxes[x]] = ($('#'+boxes[x]).is(':checked')) ? true : false;
+		    refresh();
+		});
+	}
+	//run
         loadFront();
 });
