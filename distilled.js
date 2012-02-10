@@ -91,7 +91,8 @@ function filterDupes(arr) {
     for (dupe in dupes){
 	dupe = dupes[dupe];
 	for (i = arr.length - 1; i >= 0; i--) {
-	    /* if the url is previously stored, delete it */ 
+	    /* if the url is previously stored, delete it */
+	    /* working backwards so that last remaining dupe is the top rated one */
 	    if (typeof obj[arr[i].data[dupe]] != 'undefined') {
 		delete obj[arr[i].data[dupe]];
 	    }
@@ -155,10 +156,10 @@ function redditButton(id){
 
 function longAgo(time) {
     time = time * 1000;
-    var date = new Date();
-    var now = date.getTime();
-    var offset = date.getTimezoneOffset() * 1000;
-    var hours_ago = Math.round((now - time - offset) / 1000 / 60 / 60);
+    var date = new Date(),
+	now = date.getTime(),
+	offset = date.getTimezoneOffset() * 1000,
+	hours_ago = Math.round((now - time - offset) / 1000 / 60 / 60);
     return hours_ago;
 }
 
@@ -184,7 +185,6 @@ function refresh() {
     }
 }
 
-/* Utility Functions */
 //safe console log
 function consoleLog(string){
     if(window.console) {
@@ -197,8 +197,8 @@ $(function() {
 	/* bind up check boxes */
 	var boxes = ['imgur','quickmeme','images'];
 	for(x in boxes){
-	    $('#'+boxes[x]).click(function() {
-		    globals[boxes[x]] = ($('#'+boxes[x]).is(':checked')) ? true : false;
+	    $('#'+boxes[x]).click({'box': boxes[x]},function(event) {
+		    globals[event.data.box] = ($('#'+event.data.box).is(':checked')) ? true : false;
 		    refresh();
 		});
 	}
