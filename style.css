@@ -15,6 +15,7 @@ h2 {
 }
 
 #options, #filters {
+    margin: 10px 0;
     text-align: center;
 }
 
@@ -141,4 +142,8 @@ a {
 
 label {
     vertical-align: top;
+}
+
+.selected {
+    font-weight: bold;
 }

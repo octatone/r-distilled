@@ -1,5 +1,5 @@
 /* global namespace */
-var globals = {'view': null,
+var globals = {'view': 'front',
 
 	       /* filter defauls */
 	       'imgur': true,
@@ -9,25 +9,31 @@ var globals = {'view': null,
 
 	       'cur_request': null,
 
-	       'optional_filters': {'imgur':{'type': 'domain', 'needles': ['imgur.com','i.imgur.com']},
-				    'quickmeme':{'type': 'domain', 'needles': ['quickmeme.com','qkme.me']},
-				    'images':{'type': 'url', 'needles': ['jpg','png','gif']}
-                                   }
+	       'optional_filters': {'imgur': {'type': 'domain', 'needles': ['imgur.com','i.imgur.com']},
+				    'quickmeme': {'type': 'domain', 'needles': ['quickmeme.com','qkme.me']},
+				    'images': {'type': 'url', 'needles': ['jpg','png','gif','imgur.com']}
+                                   },
+	       'posts': null
 }
 
 /* this function is recursive for sequential item displaying */
 function display(data, item) {
-    var content, button, centage, $listing = $('#listing');
+    var content, button, centage, thumbnail = '', $listing = $('#listing');
     var x = typeof(item) != 'undefined' ? item : 0;
 
     if(x == 0){
-	$listing.empty();
+	$listing.stop(true,false).empty();
     }
 
     /* gather html */
     button = redditButton('t3_' + data[x].data.id);
     centage = Math.round(data[x].data.ups / (data[x].data.ups + data[x].data.downs) * 100);
-    content = '<div id="' + data[x].data.id + '" class="thing hidden"><div class="vote-button">' + button +'</div><a href="' + data[x].data.url + '" class="thumbnail" target="_blank"><img src="' + data[x].data.thumbnail + '" width="70"/></a><div class="entry">' + '<p class="title">' + '<a href="' + data[x].data.url + '" class="title" target="_blank">' + data[x].data.title + '</a>' + ' <span class="domain">(' + data[x].data.domain + ')</span>' + '</p>' + '<p class="tagline">' + '<span class="score">' + data[x].data.score + '</span> (<span class="ups">' + data[x].data.ups + '</span>|<span class="downs">' + data[x].data.downs + '</span>) ' + centage +'% submitted ' + longAgo(data[x].data.created_utc) + ' hours ago by ' + '<a href="http://reddit.com/user/' + data[x].data.author + '" class="author" target="_blank">' + data[x].data.author + '</a> to ' + '<a href="http://reddit.com/r/' + data[x].data.subreddit + '" class="subreddit" target="_blank">' + data[x].data.subreddit + '</a>' + '</p>' + '<ul class="flat-list">' + '<li><a href="http://reddit.com' + data[x].data.permalink + '" class="comments" target="_blank">' + data[x].data.num_comments + ' comments</a></li>' + '</ul>' + '</div></div>' + '<div class="clearleft"></div>';
+    if(data[x].data.thumbnail == 'default' || data[x].data.thumbnail == 'self'){
+	//do nothing
+    }else{
+	thumbnail = '<img src="' + data[x].data.thumbnail + '" width="70"/>';
+    }
+    content = '<div id="' + data[x].data.id + '" class="thing hidden"><div class="vote-button">' + button +'</div><a href="' + data[x].data.url + '" class="thumbnail" target="_blank">' + thumbnail + '</a><div class="entry">' + '<p class="title">' + '<a href="' + data[x].data.url + '" class="title" target="_blank">' + data[x].data.title + '</a>' + ' <span class="domain">(' + data[x].data.domain + ')</span>' + '</p>' + '<p class="tagline">' + '<span class="score">' + data[x].data.score + '</span> (<span class="ups">' + data[x].data.ups + '</span>|<span class="downs">' + data[x].data.downs + '</span>) ' + centage +'% submitted ' + longAgo(data[x].data.created_utc) + ' hours ago by ' + '<a href="http://reddit.com/user/' + data[x].data.author + '" class="author" target="_blank">' + data[x].data.author + '</a> to ' + '<a href="http://reddit.com/r/' + data[x].data.subreddit + '" class="subreddit" target="_blank">' + data[x].data.subreddit + '</a>' + '</p>' + '<ul class="flat-list">' + '<li><a href="http://reddit.com' + data[x].data.permalink + '" class="comments" target="_blank">' + data[x].data.num_comments + ' comments</a></li>' + '</ul>' + '</div></div>' + '<div class="clearleft"></div>';
 
     /* display html */
     $listing.append(content);
@@ -115,7 +121,8 @@ function filterDupes(arr) {
 }
 
 function loadPosts(option) {
-    var sub = '',
+    var posts,
+	sub = '',
         $listing = $('#listing');
 
     $listing.fadeOut(function() {
@@ -128,22 +135,28 @@ function loadPosts(option) {
         sub = 'r/all/';
     }
 
-    if(globals.cur_request !== null){
-	globals.cur_request.abort();
+    if(globals.posts !== null){
+	display(filterDupes(globals.posts));
+    }else{
+
+	if(globals.cur_request !== null){
+	    globals.cur_request.abort();
+	}
+	globals.cur_request = $.ajax({
+		url: "http://reddit.com/" + sub + ".json?limit=100",
+		dataType: "jsonp",
+		jsonp: "jsonp",
+		success: function(data) {
+		    globals.posts = data.data.children;
+		    display(filterDupes(globals.posts));
+		},
+		error: function(jXHR, textStatus, errorThrown) {
+		    if (textStatus !== 'abort') {
+			$listing.empty().append('<div id="error">Could not load feed. Is reddit down?</div>');
+		    }
+		}
+	    });
     }
-    globals.cur_request = $.ajax({
-            url: "http://reddit.com/" + sub + ".json?limit=100",
-            dataType: "jsonp",
-            jsonp: "jsonp",
-            success: function(data) {
-                display(filterDupes(data.data.children));
-            },
-            error: function(jXHR, textStatus, errorThrown) {
-                if (textStatus !== 'abort') {
-                    $listing.empty().append('<div id="error">Could not load feed. Is reddit down?</div>');
-                }
-            }
-        });
 }
 
 function redditButton(id){
@@ -164,21 +177,27 @@ function longAgo(time) {
 }
 
 function loadFront() {
+    if(globals.view != 'front'){
+	globals.posts = null;
+    }
     globals.view = 'front';
-    $('#front').off();
-    $('#all').off().on('click', loadAll);
+    $('#front').off().addClass('selected');
+    $('#all').off().removeClass().on('click', loadAll);
     loadPosts();
 }
 
 function loadAll() {
+    if(globals.view != 'all'){
+	globals.posts = null;
+    }
     globals.view = 'all';
-    $('#all').off();
-    $('#front').off().on('click', loadFront);
+    $('#all').off().addClass('selected');
+    $('#front').removeClass().off().on('click', loadFront);
     loadPosts('all');
 }
 
 function refresh() {
-    if(globals.view = 'all'){
+    if(globals.view == 'all'){
 	loadAll();
     }else{
 	loadFront();
@@ -203,5 +222,5 @@ $(function() {
 		});
 	}
 	//run
-        loadFront();
+        refresh();
 });
