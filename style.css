@@ -153,3 +153,11 @@ a {
 .selected {
     font-weight: bold;
 }
+
+#beer-me {
+    position: absolute;
+    top: 0;
+    right: 0;
+    text-align: center;
+    margin: 5px;
+}
