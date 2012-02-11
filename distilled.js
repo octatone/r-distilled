@@ -13,7 +13,9 @@ var globals = {'view': 'all',
 				    'quickmeme': {'type': 'domain', 'needles': ['quickmeme.com','qkme.me']},
 				    'images': {'type': 'url', 'needles': ['jpg','png','gif','imgur.com']}
                                    },
-	       'posts': null
+	       'posts': null,
+	       
+	       'display': true /* used to break the display loop */
 }
 
 /* this function is recursive for sequential item displaying */
@@ -38,7 +40,7 @@ function display(data, item) {
     /* display html */
     $listing.append(content);
     $('#'+data[x].data.id).fadeIn(200, function(){
-	    if(x < data.length - 1){
+	    if(x < data.length - 1 && globals.display){
 		/* recurse */
 		display(data, x+1);
 	    }
@@ -128,6 +130,8 @@ function loadPosts(option) {
 	sub = '',
         $listing = $('#listing');
 
+    globals.display = false;
+
     $listing.fadeOut(function() {
             $listing.empty().show(function() {
                     $listing.append('<div id="loading">Loading ...</div>');
@@ -139,6 +143,7 @@ function loadPosts(option) {
     }
 
     if(globals.posts !== null){
+	globals.display = true;
 	display(filterDupes(globals.posts));
     }else{
 
@@ -150,7 +155,6 @@ function loadPosts(option) {
 		dataType: "jsonp",
 		jsonp: "jsonp",
 		success: function(data) {
-		    consoleLog('outer xhr');
 		    globals.posts = data.data.children;
 		    /* do it again!!! */
 		    setTimeout(function(){
@@ -159,7 +163,7 @@ function loadPosts(option) {
 				    dataType: "jsonp",
 				    jsonp: "jsonp",
 				    success: function(data) {
-					consoleLog('inner xhr')
+					globals.display = true;
 					globals.posts = globals.posts.concat(data.data.children);
 					display(filterDupes(globals.posts));
 				    },
