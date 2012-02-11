@@ -90,7 +90,8 @@ function filterDupes(arr) {
 	}else{
 	    removed += 1;
 	}
-    }    
+    }
+    $('#status-percent').html(removed);
     consoleLog('Removed by percentage: ' + removed);
     
     //reset
@@ -248,6 +249,10 @@ $(function() {
 		    refresh();
 		});
 	}
+	$('#percent').change(function(){
+		globals.percent = $(this).val();
+		refresh();
+	    });
 	//run
         refresh();
 });
