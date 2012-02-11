@@ -68,11 +68,14 @@ function filterDupes(arr) {
 		    removed += 1;
 		}
 	    }
+	    $('#status-' + opt).html(removed);
 	    consoleLog('Removed ' + opt + ' (' + globals.optional_filters[opt].type + '): ' + removed);
 
 	    //reset
 	    arr = out.reverse();
 	    out = [];
+	}else{
+	    $('#status-' + opt).html('0');
 	}
     } 
 
