@@ -209,6 +209,7 @@ function loadFront() {
     $('#front').off().addClass('selected');
     $('#all').off().removeClass().on('click', loadAll);
     loadPosts();
+    return false;
 }
 
 function loadAll() {
@@ -219,6 +220,7 @@ function loadAll() {
     $('#all').off().addClass('selected');
     $('#front').removeClass().off().on('click', loadFront);
     loadPosts('all');
+    return false;
 }
 
 function refresh() {
