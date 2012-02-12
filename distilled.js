@@ -3,14 +3,14 @@ var globals = {'view': 'all',
 
 	       /* filter defauls */
 	       'imgur': true,
-	       'quickmeme': true,
+	       'memes': true,
 	       'images': false,
 	       'percent': 55, /* posts with a total up percentage below are filtered out */
 
 	       'cur_request': null,
 
-	       'optional_filters': {'imgur': {'type': 'domain', 'needles': ['imgur.com','i.imgur.com']},
-				    'quickmeme': {'type': 'domain', 'needles': ['quickmeme.com','qkme.me']},
+	       'optional_filters': {'imgur': {'type': 'url', 'needles': ['imgur.com']},
+				    'memes': {'type': 'url', 'needles': ['quickmeme.com','qkme.me','memegenerator.net']},
 				    'images': {'type': 'url', 'needles': ['jpg','png','gif','imgur.com']}
                                    },
 	       'posts': null,
@@ -242,7 +242,7 @@ function consoleLog(string){
 //start
 $(function() {
 	/* bind up check boxes */
-	var boxes = ['imgur','quickmeme','images'];
+	var boxes = ['imgur','memes','images'];
 	for(x in boxes){
 	    $('#'+boxes[x]).click({'box': boxes[x]},function(event) {
 		    globals[event.data.box] = ($('#'+event.data.box).is(':checked')) ? true : false;
