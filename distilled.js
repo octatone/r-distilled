@@ -85,7 +85,7 @@ function filterDupes(arr) {
     removed = 0;
     for (i = arr.length - 1; i >= 0; i--) {
 	centage = Math.round(arr[i].data.ups / (arr[i].data.ups + arr[i].data.downs) * 100);
-	if(centage > globals.percent){
+	if(centage >= globals.percent){
 	    out.push(arr[i]);
 	}else{
 	    removed += 1;
