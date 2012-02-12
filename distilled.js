@@ -98,6 +98,30 @@ function filterDupes(arr) {
     arr = out.reverse();
     out = [];
 
+    //remove by similar titles
+    removed = 0;
+    for (this_item = arr.length - 1; this_item >= 0; this_item--) {
+	var hit = 0;
+	for (that_item in arr){
+	    if(this_item > that_item
+               && Math.abs(arr[this_item].data.title.length - arr[that_item].data.title.length) < 10){
+		var similar = string_metrics.similarity(arr[this_item].data.title, arr[that_item].data.title);
+		if(similar > 0.9){
+		    hit += 1;
+		    consoleLog('hit similar: ' + arr[this_item].data.title + ', ' + arr[that_item].data.title);
+		}
+	    }
+	}
+	if(hit == 0){
+	    out.push(arr[this_item]);
+	}
+    }
+    consoleLog('Removed by similar titles: ' + (arr.length - out.length));
+
+    //reset                                                                                                                       
+    arr = out.reverse();
+    out = [];
+
     //revmove dupes urls, subreddits
     var dupes = ['url','subreddit'];
     for (dupe in dupes){
