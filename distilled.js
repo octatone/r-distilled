@@ -28,7 +28,7 @@ function display(data, item) {
     }
 
     /* gather html */
-    button = redditButton('t3_' + data[x].data.id);
+    button = redditButton(data[x].data.name);
     centage = Math.round(data[x].data.ups / (data[x].data.ups + data[x].data.downs) * 100);
     if(data[x].data.thumbnail == 'default' || data[x].data.thumbnail == 'self'){
 	//do nothing
