@@ -106,7 +106,7 @@ function filterDupes(arr) {
 	    if(this_item > that_item
                && Math.abs(arr[this_item].data.title.length - arr[that_item].data.title.length) < 10){
 		var similar = string_metrics.similarity(arr[this_item].data.title, arr[that_item].data.title);
-		if(similar > 0.9){
+		if(similar > 0.7){
 		    hit += 1;
 		    consoleLog('hit similar: ' + arr[this_item].data.title + ', ' + arr[that_item].data.title);
 		}
