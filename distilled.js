@@ -1,20 +1,23 @@
 /* global namespace */
-var globals = {'view': 'all',
-
+var globals = {
 	       /* filter defauls */
 	       'imgur': true,
 	       'memes': true,
 	       'images': false,
 	       'percent': 55, /* posts with a total up percentage below are filtered out */
 
-	       'cur_request': null,
-
+	       /* filter settings */
 	       'optional_filters': {'imgur': {'type': 'url', 'needles': ['imgur.com']},
-				    'memes': {'type': 'url', 'needles': ['quickmeme.com','qkme.me','memegenerator.net']},
+				    'memes': {'type': 'url', 'needles': ['quickmeme.com','qkme.me',
+									 'memegenerator.net', 'memecrunch.com',
+									 'weknowmemes.com']},
 				    'images': {'type': 'url', 'needles': ['jpg','png','gif','imgur.com']}
                                    },
+
+	       /* status tracking vars */
+	       'view': 'all',
 	       'posts': null,
-	       
+	       'cur_request': null,
 	       'display': true /* used to break the display loop */
 }
 
