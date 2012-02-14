@@ -11,7 +11,7 @@ var globals = {
 				    'memes': {'type': 'url', 'needles': ['quickmeme.com','qkme.me',
 									 'memegenerator.net', 'memecrunch.com',
 									 'weknowmemes.com']},
-				    'images': {'type': 'url', 'needles': ['jpg','png','gif','imgur.com']}
+				    'images': {'type': 'url', 'needles': ['jpg','png','gif','imgur.com','flickr.com']}
                                    },
 
 	       /* status tracking vars */
@@ -153,6 +153,28 @@ function filterDupes(arr) {
     return arr;
 }
 
+function sinkImages(arr) {
+    var needle, found,
+	images = [], posts = [];
+
+    for (i = 0; i < arr.length; i++) {
+	found = false;
+	for(needle in globals.optional_filters.images.needles){
+	    needle = globals.optional_filters.images.needles[needle];
+	    found = arr[i].data[globals.optional_filters.images.type].indexOf(needle) == -1 ? found : true;
+	}
+	if(found){
+	    images.push(arr[i]);
+	}else{
+	    posts.push(arr[i]);
+	}
+    }
+
+    arr = posts.concat(images);
+    
+    return arr;
+}
+
 function loadPosts(option) {
     var posts,
 	sub = '',
@@ -194,7 +216,7 @@ function loadPosts(option) {
 				    success: function(data) {
 					globals.display = true;
 					globals.posts = globals.posts.concat(data.data.children);
-					display(filterDupes(globals.posts));
+					display(sinkImages(filterDupes(globals.posts)));
 				    },
 				    error: function(jXHR, textStatus, errorThrown) {
 					if (textStatus !== 'abort') {
