@@ -195,7 +195,7 @@ function loadPosts(option) {
 
     if(globals.posts !== null){
 	globals.display = true;
-	display(filterDupes(globals.posts));
+	display(sinkImages(filterDupes(globals.posts)));
     }else{
 
 	if(globals.cur_request !== null){
