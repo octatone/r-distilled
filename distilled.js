@@ -158,6 +158,7 @@ function loadPosts(option) {
 	sub = '',
         $listing = $('#listing');
 
+    /* try and break display loop */
     globals.display = false;
 
     $listing.fadeOut(function() {
