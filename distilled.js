@@ -11,7 +11,8 @@ var globals = {
 				    'memes': {'type': 'url', 'needles': ['quickmeme.com','qkme.me',
 									 'memegenerator.net', 'memecrunch.com',
 									 'weknowmemes.com']},
-				    'images': {'type': 'url', 'needles': ['jpg','png','gif','imgur.com','flickr.com']}
+				    'images': {'type': 'url', 'needles': ['jpg','png','gif','imgur.com',
+									  'flickr.com','deviantart.com']}
                                    },
 
 	       /* status tracking vars */
@@ -125,8 +126,8 @@ function filterDupes(arr) {
     arr = out.reverse();
     out = [];
 
-    //revmove dupes urls, subreddits
-    var dupes = ['url','subreddit'];
+    //revmove dupes urls
+    var dupes = ['url'];
     for (dupe in dupes){
 	dupe = dupes[dupe];
 	for (i = arr.length - 1; i >= 0; i--) {
@@ -149,6 +150,24 @@ function filterDupes(arr) {
 	out = [];
 	obj = {};
     }
+
+    
+    //limit count per sr
+    var limit = 3;
+    var counts = [];
+    for(i = 0; i < arr.length; i++) {
+	if(typeof(counts[arr[i].data.subreddit]) == 'undefined'){
+	    counts[arr[i].data.subreddit] = 0;
+	}
+	counts[arr[i].data.subreddit] += 1;
+	if(counts[arr[i].data.subreddit] <= limit){
+	    out.push(arr[i]);
+	}
+    }
+    consoleLog('Removed subreddit: ' + (arr.length - out.length));
+
+    arr = out;
+   
     consoleLog('Posts distilled: ' + arr.length);
     return arr;
 }
