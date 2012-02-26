@@ -4,6 +4,7 @@ var globals = {
 	       'imgur': true,
 	       'memes': true,
 	       'images': false,
+	       'cj': true,
 	       'percent': 55, /* posts with a total up percentage below are filtered out */
 
 	       /* filter settings */
@@ -12,7 +13,8 @@ var globals = {
 									 'memegenerator.net', 'memecrunch.com',
 									 'weknowmemes.com']},
 				    'images': {'type': 'url', 'needles': ['jpg','png','gif','imgur.com',
-									  'flickr.com','deviantart.com']}
+									  'flickr.com','deviantart.com']},
+				    'cj': {'type': 'subreddit', 'needles': ['circlejerk']}
                                    },
 
 	       /* status tracking vars */
@@ -47,7 +49,7 @@ function display(data, item) {
 
     /* display html */
     $listing.append(content);
-    $('#'+data[x].data.id).show(50,function(){
+    $('#'+data[x].data.id).show(0,function(){
 	    if(x < data.length - 1 && globals.display){
 		/* recurse */
 		display(data, x+1);
