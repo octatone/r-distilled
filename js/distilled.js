@@ -1,27 +1,27 @@
 /* global namespace */
 var globals = {
-	       /* filter defauls */
-	       'imgur': true,
-	       'memes': true,
-	       'images': false,
-	       'cj': true,
-	       'percent': 55, /* posts with a total up percentage below are filtered out */
-
-	       /* filter settings */
-	       'optional_filters': {'imgur': {'type': 'url', 'needles': ['imgur.com']},
-				    'memes': {'type': 'url', 'needles': ['quickmeme.com','qkme.me',
-									 'memegenerator.net', 'memecrunch.com',
-									 'weknowmemes.com']},
-				    'images': {'type': 'url', 'needles': ['jpg','png','gif','imgur.com',
-									  'flickr.com','deviantart.com']},
-				    'cj': {'type': 'subreddit', 'needles': ['circlejerk']}
-                                   },
-
-	       /* status tracking vars */
-	       'view': 'all',
-	       'posts': null,
-	       'cur_request': null,
-	       'display': true /* used to break the display loop */
+    /* filter defauls */
+    'imgur': true,
+    'memes': true,
+    'images': false,
+    'cj': true,
+    'percent': 55, /* posts with a total up percentage below are filtered out */
+    
+    /* filter settings */
+    'optional_filters': {'imgur': {'type': 'url', 'needles': ['imgur.com']},
+			 'memes': {'type': 'url', 'needles': ['quickmeme.com','qkme.me',
+							      'memegenerator.net', 'memecrunch.com',
+							      'weknowmemes.com']},
+			 'images': {'type': 'url', 'needles': ['jpg','png','gif','imgur.com',
+							       'flickr.com','deviantart.com']},
+			 'cj': {'type': 'subreddit', 'needles': ['circlejerk']}
+    },
+    
+    /* status tracking vars */
+    'view': 'all',
+    'posts': null,
+    'cur_request': null,
+    'display': true /* used to break the display loop */
 }
 
 /* this function is recursive for sequential item displaying */
@@ -45,16 +45,24 @@ function display(data, item) {
 	details = '<details>' + $("<div/>").html(data[x].data.media_embed.content).text() + '</details>';
     }
 
-    content = '<div id="' + data[x].data.id + '" class="thing hidden"><div class="vote-button">' + button +'</div><a href="' + data[x].data.url + '" class="thumbnail" target="_blank">' + thumbnail + '</a><div class="entry">' + '<p class="title">' + '<a href="' + data[x].data.url + '" class="title" target="_blank">' + data[x].data.title + '</a>' + ' <span class="domain">(' + data[x].data.domain + ')</span>' + '</p>' + '<p class="tagline">' + '<span class="score">' + data[x].data.score + '</span> (<span class="ups">' + data[x].data.ups + '</span>|<span class="downs">' + data[x].data.downs + '</span>) ' + centage +'% submitted ' + longAgo(data[x].data.created_utc) + ' hours ago by ' + '<a href="http://reddit.com/user/' + data[x].data.author + '" class="author" target="_blank">' + data[x].data.author + '</a> to ' + '<a href="http://reddit.com/r/' + data[x].data.subreddit + '" class="subreddit" target="_blank">' + data[x].data.subreddit + '</a>' + '</p>' + '<ul class="flat-list">' + '<li><a href="http://reddit.com' + data[x].data.permalink + '" class="comments" target="_blank">' + data[x].data.num_comments + ' comments</a></li>' + '</ul>' + details + '</div></div>' + '<div class="clearleft"></div>';
+    content = '<div id="' + data[x].data.id + '" class="thing hidden"><div class="vote-button"></div><a href="' + data[x].data.url + '" class="thumbnail" target="_blank">' + thumbnail + '</a><div class="entry">' + '<p class="title">' + '<a href="' + data[x].data.url + '" class="title" target="_blank">' + data[x].data.title + '</a>' + ' <span class="domain">(' + data[x].data.domain + ')</span>' + '</p>' + '<p class="tagline">' + '<span class="score">' + data[x].data.score + '</span> (<span class="ups">' + data[x].data.ups + '</span>|<span class="downs">' + data[x].data.downs + '</span>) ' + centage +'% submitted ' + longAgo(data[x].data.created_utc) + ' hours ago by ' + '<a href="http://reddit.com/user/' + data[x].data.author + '" class="author" target="_blank">' + data[x].data.author + '</a> to ' + '<a href="http://reddit.com/r/' + data[x].data.subreddit + '" class="subreddit" target="_blank">' + data[x].data.subreddit + '</a>' + '</p>' + '<ul class="flat-list">' + '<li><a href="http://reddit.com' + data[x].data.permalink + '" class="comments" target="_blank">' + data[x].data.num_comments + ' comments</a></li>' + '</ul>' + details + '</div></div>' + '<div class="clearleft"></div>';
 
     /* display html */
     $listing.append(content);
+    $('#'+data[x].data.id).on('mouseenter',{id: data[x].data.id, button: button}, showButton);
     $('#'+data[x].data.id).show(0,function(){
 	    if(x < data.length - 1 && globals.display){
 		/* recurse */
 		display(data, x+1);
 	    }
 	});
+}
+
+function showButton(event){
+    consoleLog('mouseenter event');
+    if(document.getElementById(event.data.id).getElementsByClassName('vote-button')[0].innerHTML == ''){
+	document.getElementById(event.data.id).getElementsByClassName('vote-button')[0].innerHTML = event.data.button;
+    }
 }
 
 function filterDupes(arr) {
