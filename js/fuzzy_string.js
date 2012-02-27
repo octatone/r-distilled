@@ -25,13 +25,15 @@ var string_metrics = {
 	var s = string.toLowerCase();
 	// Improvement by Raymond May Jr. for english strings - ignore punctuation and non-word chars
 	s = s.replace(/[^a-z 0-9]+/g,'');
-	var v = new Array(s.length-1);
-	for (i = 0; i< v.length; i++){
-	    v[i] =s.slice(i,i+2);
+	if(s.length > 2){
+	    var v = new Array(s.length-1);
+	    for (i = 0; i< v.length; i++){
+		v[i] =s.slice(i,i+2);
+	    }
+	    // Improvement by RM remove dupes
+	    return this.remove_dupes(v);
 	}
-	// Improvement by RM remove dupes
-	return this.remove_dupes(v);
-	//return v;
+	return [];
     },
 
     similarity: function(str1, str2) {
