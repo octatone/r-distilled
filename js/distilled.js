@@ -4,7 +4,7 @@ var globals = {
     'imgur': true,
     'memes': true,
     'images': false,
-    'cj': true,
+    'subreddits': true,
     'percent': 55, /* posts with a total up percentage below are filtered out */
     
     /* filter settings */
@@ -14,7 +14,7 @@ var globals = {
 							      'weknowmemes.com']},
 			 'images': {'type': 'url', 'needles': ['jpg','png','gif','imgur.com',
 							       'flickr.com','deviantart.com']},
-			 'cj': {'type': 'subreddit', 'needles': ['circlejerk']}
+			 'subreddits': {'type': 'subreddit', 'needles': ['circlejerk','funny']}
     },
     
     /* status tracking vars */
@@ -78,18 +78,21 @@ function filterDupes(arr) {
     for(var opt in globals.optional_filters){
 	if(globals[opt]){
 	    removed = 0;
+
 	    for (i = arr.length - 1; i >= 0; i--) {
 		found = false;
 		for(needle in globals.optional_filters[opt].needles){
 		    needle = globals.optional_filters[opt].needles[needle];
+		    needle = (needle === '' ? null : needle);
 		    found = arr[i].data[globals.optional_filters[opt].type].indexOf(needle) == -1 ? found : true;
-		}			
+		}
 		if(!found){
 		    out.push(arr[i]);
 		}else{
 		    removed += 1;
 		}
 	    }
+
 	    $('#status-' + opt).html(removed);
 	    consoleLog('Removed ' + opt + ' (' + globals.optional_filters[opt].type + '): ' + removed);
 
@@ -324,6 +327,25 @@ function consoleLog(string){
     }
 }
 
+var UserData = {
+    loadSettings: function(){
+	/* subreddit filters */
+	if(localStorage.getItem('subreddits') !== null){
+	    var subreddits = JSON.parse(localStorage.getItem('subreddits'));
+	    globals.optional_filters.subreddits.needles = subreddits;
+	    /* show in doc */
+	    $('#subreddits').val(subreddits.join(','));
+	}else{
+	    $('#subreddits').val(globals.optional_filters.subreddits.needles.join(','));
+	}
+    },
+
+    storeSettings: function(){
+	/* subreddit filters */
+	localStorage.setItem('subreddits', JSON.stringify(globals.optional_filters.subreddits.needles));
+    }
+}
+
 //start
 $(function() {
 	/* bind up check boxes */
@@ -338,6 +360,26 @@ $(function() {
 		globals.percent = $(this).val();
 		refresh();
 	    });
+	$('#subreddits-apply').click(function(){
+		var subreddits = $('#subreddits').val();
+		if(subreddits != null){
+		    subreddits = subreddits.split(',');
+		    /* trim */
+		    for(var i in subreddits){
+			subreddits[i] = $.trim(subreddits[i]);
+		    }
+		    globals.optional_filters.subreddits.needles = subreddits;
+		    $('#subreddits').val(subreddits.join(','));
+		    UserData.storeSettings();
+		    refresh();
+		}
+	    });
+	/* prevent form submit */
+	$('#filters>form').submit(function(){return false;});
+
+	/* load user settings */
+	UserData.loadSettings();
+
 	//run
         refresh();
 });

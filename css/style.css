@@ -14,6 +14,10 @@ h2 {
     font-size: small;
 }
 
+button {
+    padding: 1px 6px !important;
+}
+
 #options, #filters, #status {
     margin: 10px 0;
     text-align: center;
