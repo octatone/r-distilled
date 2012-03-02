@@ -1,5 +1,6 @@
 body {
     font: normal x-small 'Habibi', serif;
+    letter-spacing: .1em;
     background: url(../img/tile.jpg);
 }
 
@@ -48,6 +49,22 @@ div.thing {
     padding: 5px;
     margin: 0 10px;
     margin-bottom: 30px;
+    /* trans */
+    -webkit-transition-property: background, border, box-shadow;
+    -webkit-transition-duration: 1s;
+}
+
+div.thing:hover {
+    background: white;
+    box-shadow: 0 0 10px #999;
+    border: 1px solid #000;
+    /* trans */
+    -webkit-transition-property: background, border, box-shadow;
+    -webkit-transition-duration: 1s;
+}
+
+div.thing:hover .title{
+    color: #000;
 }
 
 .vote-button {
@@ -182,7 +199,7 @@ a {
 #beer-me {
     position: absolute;
     top: 0;
-    right: 0;
+    left: 0;
     text-align: center;
     margin: 5px;
 }
