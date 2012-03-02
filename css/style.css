@@ -1,5 +1,5 @@
 body {
-    font: normal x-small verdana, arial, helvetica, sans-serif;
+    font: normal x-small 'Habibi', serif;
     background: #F0F8FF;
 }
 
@@ -63,13 +63,13 @@ div.thing {
 }
 
 .title {
-    font-size: medium;
+    font-size: large;
     font-weight: normal;
     margin-bottom: 1px;
 }
 
 .thing .title {
-    color: blue;
+    color: #333;
     padding: 0px;
     overflow: hidden;
 }
