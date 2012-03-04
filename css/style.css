@@ -196,6 +196,11 @@ a {
     font-weight: bold;
 }
 
+.details p {
+    font-size: small;
+    margin: 1em;
+}
+
 #beer-me {
     position: absolute;
     top: 0;
