@@ -150,6 +150,13 @@ a.author {
     padding: 0 1px;
 }
 
+.md {
+    border: 1px dashed #DDD;
+    background: white;
+    margin: 0 1em 1em 0;
+    color: #000;
+}
+
 a {
     text-decoration: none;
 }
@@ -199,6 +206,9 @@ a {
 .details p {
     font-size: small;
     margin: 1em;
+}
+.details {
+    margin: 1em 0;
 }
 
 #beer-me {
