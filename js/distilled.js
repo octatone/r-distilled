@@ -85,8 +85,8 @@ function filterDupes(arr) {
 		found = false;
 		for(needle in globals.optional_filters[opt].needles){
 		    needle = globals.optional_filters[opt].needles[needle];
-		    needle = (needle === '' ? null : needle);
-		    found = arr[i].data[globals.optional_filters[opt].type].indexOf(needle) == -1 ? found : true;
+		    needle = (needle === '' ? null : needle.toLowerCase());
+		    found = arr[i].data[globals.optional_filters[opt].type].toLowerCase().indexOf(needle) == -1 ? found : true;
 		}
 		if(!found){
 		    out.push(arr[i]);
