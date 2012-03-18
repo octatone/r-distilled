@@ -38,7 +38,7 @@ function display(data, item) {
     centage = Math.round(data[x].data.ups / (data[x].data.ups + data[x].data.downs) * 100);
     if(data[x].data.thumbnail == 'default' || data[x].data.thumbnail == 'self'){
 	//do nothing
-    }else{
+    }else if(data[x].data.thumbnail !== ''){
 	thumbnail = '<img src="' + data[x].data.thumbnail + '" width="70"/>';
     }
     //media & self
