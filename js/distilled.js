@@ -36,7 +36,7 @@ function display(data, item) {
     /* gather html */
     button = redditButton(data[x].data.name);
     centage = Math.round(data[x].data.ups / (data[x].data.ups + data[x].data.downs) * 100);
-    if(data[x].data.thumbnail == 'default' || data[x].data.thumbnail == 'self'){
+    if(data[x].data.thumbnail == 'default' || data[x].data.thumbnail == 'self' || data[x].data.thumbnail == 'nsfw'){
 	//do nothing
     }else if(data[x].data.thumbnail !== ''){
 	thumbnail = '<img src="' + data[x].data.thumbnail + '" width="70"/>';
