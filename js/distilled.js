@@ -237,12 +237,18 @@ function loadPosts(option) {
 	globals.display = true;
 	display(sinkImages(filterDupes(globals.posts)));
     }else{
+	/* only want results from 24 hours or newer */
+	var time_back = 12 * 60 * 60,
+	    date = new Date(),
+	    unixtime_ms = date.getTime(),
+	    unixtime = parseInt(unixtime_ms / 1000);
+	var timestamp = unixtime - time_back;
 
 	if(globals.cur_request !== null){
 	    globals.cur_request.abort();
 	}
 	globals.cur_request = $.ajax({
-		url: "http://reddit.com/" + sub + ".json?limit=100",
+		url: "http://reddit.com/" + sub + "search/.json?q=timestamp%3A"+timestamp+"..&sort=top&restrict_sr=on&limit=100",
 		dataType: "jsonp",
 		jsonp: "jsonp",
 		success: function(data) {
@@ -250,7 +256,7 @@ function loadPosts(option) {
 		    /* do it again!!! */
 		    setTimeout(function(){
 			    globals.cur_request = $.ajax({
-				    url: "http://reddit.com/" + sub + ".json?limit=100&after=" + globals.posts[globals.posts.length -1].data.name,
+				    url: "http://reddit.com/" + sub + "search/.json?q=timestamp%3A"+timestamp+"..&sort=top&after=" + globals.posts[globals.posts.length -1].data.name+"&restrict_sr=on&limit=100",
 				    dataType: "jsonp",
 				    jsonp: "jsonp",
 				    success: function(data) {
